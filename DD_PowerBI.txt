@@ -1,0 +1,26 @@
+{
+    "name": "DD_PowerBI",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "Sftp_Ignite",
+            "type": "LinkedServiceReference"
+        },
+        "folder": {
+            "name": "Final PPM Deployable"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+            "location": {
+                "type": "SftpLocation",
+                "folderPath": "/PowerBILogs"
+            },
+            "columnDelimiter": ",",
+            "escapeChar": "\\",
+            "firstRowAsHeader": true,
+            "quoteChar": "\""
+        },
+        "schema": []
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

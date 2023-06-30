@@ -1,0 +1,237 @@
+{
+    "name": "Sub_SQLMetrics",
+    "properties": {
+        "activities": [
+            {
+                "name": "get_currentDate_Year",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "policy": {
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "currentDate_Year",
+                    "value": {
+                        "value": "@formatDateTime(adddays(utcNow(),-1), 'yyyy')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "get_currentDate_Month",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "get_currentDate_Year",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "currentDate_Month",
+                    "value": {
+                        "value": "@formatDateTime(adddays(utcNow(),-1), 'MM')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "get_currentDate_Day",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "get_currentDate_Month",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "currentDate_Day",
+                    "value": {
+                        "value": "@formatDateTime(adddays(utcNow(),-1), 'dd')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "ForEach_Hour",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "get_currentDate_Day",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@variables('HourList')",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Copy data1",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "JsonSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true,
+                                        "enablePartitionDiscovery": false
+                                    },
+                                    "formatSettings": {
+                                        "type": "JsonReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "JsonSink",
+                                    "storeSettings": {
+                                        "type": "SftpWriteSettings",
+                                        "copyBehavior": "FlattenHierarchy",
+                                        "operationTimeout": "01:00:00",
+                                        "useTempFileRename": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "JsonWriteSettings"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "SD_SQLMetrics",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "Container": {
+                                            "value": "@pipeline().parameters.Container",
+                                            "type": "Expression"
+                                        },
+                                        "LocationString": {
+                                            "value": "@pipeline().parameters.LocationString",
+                                            "type": "Expression"
+                                        },
+                                        "Jsonfilename": {
+                                            "value": "@pipeline().parameters.Jsonfilename",
+                                            "type": "Expression"
+                                        },
+                                        "Current_Year": {
+                                            "value": "@concat('y=',variables('currentDate_Year'))",
+                                            "type": "Expression"
+                                        },
+                                        "Current_Month": {
+                                            "value": "@concat('/m=',variables('currentDate_Month'))",
+                                            "type": "Expression"
+                                        },
+                                        "Current_day": {
+                                            "value": "@concat('/d=',variables('currentDate_Day'),'/')",
+                                            "type": "Expression"
+                                        },
+                                        "hour": {
+                                            "value": "@item()",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "DD_SQLMetrics",
+                                    "type": "DatasetReference"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "LocationString": {
+                "type": "string"
+            },
+            "Container": {
+                "type": "string"
+            },
+            "Jsonfilename": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "currentDate_Year": {
+                "type": "String"
+            },
+            "currentDate_Month": {
+                "type": "String"
+            },
+            "currentDate_Day": {
+                "type": "String"
+            },
+            "HourList": {
+                "type": "Array",
+                "defaultValue": [
+                    "h=00",
+                    "h=01",
+                    "h=02",
+                    "h=03",
+                    "h=04",
+                    "h=05",
+                    "h=06",
+                    "h=07",
+                    "h=08",
+                    "h=09",
+                    "h=10",
+                    "h=11",
+                    "h=12",
+                    "h=13",
+                    "h=14",
+                    "h=15",
+                    "h=16",
+                    "h=17",
+                    "h=18",
+                    "h=19",
+                    "h=20",
+                    "h=21",
+                    "h=22",
+                    "h=23"
+                ]
+            }
+        },
+        "folder": {
+            "name": "PPM Final deployable"
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-06-19T14:47:33Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

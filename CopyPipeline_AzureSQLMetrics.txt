@@ -1,0 +1,84 @@
+{
+    "name": "CopyPipeline_AzureSQLMetrics",
+    "properties": {
+        "activities": [
+            {
+                "name": "ForEach_SQLMetrics",
+                "type": "ForEach",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@pipeline().parameters.LocationString_SQLMetrics",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "CopyPipeline_SQLMetrics",
+                            "type": "ExecutePipeline",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "pipeline": {
+                                    "referenceName": "Sub_SQLMetrics",
+                                    "type": "PipelineReference"
+                                },
+                                "waitOnCompletion": true,
+                                "parameters": {
+                                    "LocationString": {
+                                        "value": "@item()",
+                                        "type": "Expression"
+                                    },
+                                    "Container": {
+                                        "value": "@pipeline().parameters.Container_SQLMetrics",
+                                        "type": "Expression"
+                                    },
+                                    "Jsonfilename": {
+                                        "value": "@pipeline().parameters.Jsonfilename_SQLMetrics",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "LocationString_SQLMetrics": {
+                "type": "array",
+                "defaultValue": [
+                    "resourceId=/SUBSCRIPTIONS/02659DCE-3C31-471F-829F-CECEF155C4FF/RESOURCEGROUPS/TESTADF/PROVIDERS/MICROSOFT.SQL/SERVERS/IGNITE-DEV-SQL-SRV/DATABASES/IGNITESQLDB01/"
+                ]
+            },
+            "Container_SQLMetrics": {
+                "type": "string",
+                "defaultValue": "insights-metrics-pt1m"
+            },
+            "Jsonfilename_SQLMetrics": {
+                "type": "string",
+                "defaultValue": "PT1H"
+            }
+        },
+        "variables": {
+            "workspace": {
+                "type": "String"
+            },
+            "currentDate_Year_Databricks": {
+                "type": "String"
+            },
+            "currentDate_Month_Databricks": {
+                "type": "String"
+            },
+            "currentDate_Day_Databricks": {
+                "type": "String"
+            }
+        },
+        "folder": {
+            "name": "PPM Final deployable"
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-06-27T15:57:41Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

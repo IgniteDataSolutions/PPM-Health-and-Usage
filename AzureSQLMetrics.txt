@@ -1,0 +1,19 @@
+/****** Object:  Table [dbo].[PT1H]    Script Date: 6/1/2023 8:58:17 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [PPM].[AzureSQLMetrics](
+	[count] [smallint] NULL,
+	[total] float NULL,
+	[minimum] float NULL,
+	[maximum] float NULL,
+	[resourceId] [nvarchar](max) NULL,
+	[time] [nvarchar](max) NULL,
+	[metricname] [nvarchar](max) NULL,
+	[timeGrain] [nvarchar](max) NULL,
+	[average] float NULL
+) ON [PRIMARY]
+GO

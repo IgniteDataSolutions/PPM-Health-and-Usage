@@ -1,0 +1,118 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Create_CSV_table": {
+                "inputs": {
+                    "format": "CSV",
+                    "from": "@body('Run_a_query_against_a_dataset')?['firstTableRows']"
+                },
+                "runAfter": {
+                    "Run_a_query_against_a_dataset": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Table"
+            },
+            "Create_blob_(V2)": {
+                "inputs": {
+                    "body": "@body('Create_CSV_table')",
+                    "headers": {
+                        "ReadFileMetadataFromServer": true
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                    "queries": {
+                        "folderPath": "/powerbilogs",
+                        "name": "@{triggerBody()?['Name']}.csv",
+                        "queryParametersSingleEncoded": true
+                    }
+                },
+                "runAfter": {
+                    "Create_CSV_table": [
+                        "Succeeded"
+                    ]
+                },
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                },
+                "type": "ApiConnection"
+            },
+            "Run_a_query_against_a_dataset": {
+                "inputs": {
+                    "body": {
+                        "query": "EVALUATE(\nSELECTCOLUMNS (\nSUMMARIZECOLUMNS('Reports'[ReportName],\n'Users'[UserId],\n'Report page views'[Date],\n\"Views\",'Model measures'[Report views]),\n\"Asset Name\", [ReportName],\n\"User_ID\", [UserId],\n\"Datestamp\", [Date],\n\"Views\", [Report views]))\n",
+                        "serializerSettings": {
+                            "includeNulls": false
+                        }
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['powerbi']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v1.0/myorg/groups/@{encodeURIComponent(triggerBody()?['Workspace'])}/datasets/@{encodeURIComponent(triggerBody()?['Dataset'])}/executeQueries",
+                    "queries": {
+                        "pbi_source": "powerAutomate"
+                    }
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "manual": {
+                "inputs": {
+                    "schema": {
+                        "properties": {
+                            "Dataset": {
+                                "type": "string"
+                            },
+                            "Name": {
+                                "type": "string"
+                            },
+                            "Workspace": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "kind": "Http",
+                "type": "Request"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azureblob": {
+                    "connectionId": "/subscriptions/--SUBSCRIPTIONID--/resourceGroups/TestADF/providers/Microsoft.Web/connections/-----CONNECTIONNAME------",
+                    "connectionName": "-----CONNECTIONNAME------",
+                    "id": "/subscriptions/--SUBSCRIPTIONID--/providers/Microsoft.Web/locations/australiasoutheast/managedApis/azureblob"
+                },
+                "powerbi": {
+                    "connectionId": "/subscriptions/--SUBSCRIPTIONID--/resourceGroups/TestADF/providers/Microsoft.Web/connections/-----CONNECTIONNAME------",
+                    "connectionName": "-----CONNECTIONNAME------",
+                    "id": "/subscriptions/--SUBSCRIPTIONID--/providers/Microsoft.Web/locations/australiasoutheast/managedApis/powerbi"
+                }
+            }
+        }
+    }
+}

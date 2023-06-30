@@ -1,0 +1,22 @@
+{
+    "name": "DD_DatabricksUsage",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "Sftp_Ignite",
+            "type": "LinkedServiceReference"
+        },
+        "folder": {
+            "name": "Final PPM Deployable"
+        },
+        "annotations": [],
+        "type": "Json",
+        "typeProperties": {
+            "location": {
+                "type": "SftpLocation",
+                "folderPath": "/DatabricksAuditLogs/Inbox"
+            }
+        },
+        "schema": {}
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

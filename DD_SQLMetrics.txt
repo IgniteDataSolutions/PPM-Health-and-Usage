@@ -1,0 +1,22 @@
+{
+    "name": "DD_SQLMetrics",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "Sftp_Ignite",
+            "type": "LinkedServiceReference"
+        },
+        "folder": {
+            "name": "Final PPM Deployable"
+        },
+        "annotations": [],
+        "type": "Json",
+        "typeProperties": {
+            "location": {
+                "type": "SftpLocation",
+                "folderPath": "/SQLMetrics/Inbox"
+            }
+        },
+        "schema": {}
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

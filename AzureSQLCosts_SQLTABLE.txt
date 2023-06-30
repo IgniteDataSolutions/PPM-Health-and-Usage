@@ -1,0 +1,6 @@
+CREATE SCHEMA PPM;
+CREATE TABLE [PPM].[AzureSQLCosts](
+	[DETAILS] [nvarchar](2000) NOT NULL
+	
+) ON [PRIMARY]
+GO
